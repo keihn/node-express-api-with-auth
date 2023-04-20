@@ -72,6 +72,25 @@ app.post('/post', imageHandler.single('thumbnail'), async (req, res) => {
     res.status(200).json(postData);
 })
 
+app.get('/posts', async (req, res) => {
+    res.json(await Post.find()
+    .populate('author', ['username'])
+    .sort({createdAt: -1})
+    .limit(20))
+});
+
+app.get('/post/:id', async (req, res) => {
+    res.json(req.params);
+});
+
+app.get('/profile/', (req, res) => {
+    const {token} = req.cookies;
+    jwt.verify(token, tokenSecret, {}, (error, data) => {
+        if(error) res.json({success: false, message: "Authentication failed"})
+        res.status(200).json(data)
+    });
+});
+
 app.get('/profile/', (req, res) => {
     const {token} = req.cookies;
     jwt.verify(token, tokenSecret, {}, (error, data) => {
